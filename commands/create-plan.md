@@ -17,6 +17,7 @@ When this command is invoked:
    - Begin the research process
 
 2. **If no parameters provided**, respond with:
+
 ```
 I'll help you create a detailed implementation plan. Let me start by understanding what we're building.
 
@@ -50,8 +51,9 @@ Then wait for the user's input.
    - Delegate to **/codebase-locator** to find all files related to the ticket/task
    - Delegate to **/codebase-analyzer** to understand how the current implementation works
    - Delegate to **/research-locator** to find any existing research or plans about this feature
-   
+
    Invoke these sub-agents in parallel using the Task tool:
+
    ```
    Task(prompt="Use /codebase-locator to find all files related to [feature/component]")
    Task(prompt="Use /codebase-analyzer to analyze how [system] currently works")
@@ -76,6 +78,7 @@ Then wait for the user's input.
    - Determine true scope based on codebase reality
 
 5. **Present informed understanding and focused questions**:
+
    ```
    Based on the ticket and my research of the codebase, I understand we need to [accurate summary].
 
@@ -118,6 +121,7 @@ After getting initial clarifications:
    - **/research-analyzer** - To extract key insights from relevant prior research/plans
 
    Example of spawning multiple sub-agents in parallel:
+
    ```
    // Spawn these concurrently using multiple Task tool calls in one message:
    Task(prompt="Use /codebase-locator to find all files related to database schema for [feature]")
@@ -135,6 +139,7 @@ After getting initial clarifications:
 4. **Wait for ALL sub-agents to complete** before proceeding
 
 5. **Present findings and design options**:
+
    ```
    Based on my research, here's what I found:
 
@@ -158,6 +163,7 @@ After getting initial clarifications:
 Once aligned on approach:
 
 1. **Create initial plan outline**:
+
    ```
    Here's my proposed plan structure:
 
@@ -205,6 +211,7 @@ After structure approval:
 [A Specification of the desired end state after this plan is complete, and how to verify it]
 
 ### Key Discoveries:
+
 - [Important finding with file:line reference]
 - [Pattern to follow]
 - [Constraint to work within]
@@ -220,11 +227,13 @@ After structure approval:
 ## Phase 1: [Descriptive Name]
 
 ### Overview
+
 [What this phase accomplishes]
 
 ### Changes Required:
 
 #### 1. [Component/File Group]
+
 **File**: `path/to/file.ext`
 **Changes**: [Summary of changes]
 
@@ -235,12 +244,14 @@ After structure approval:
 ### Success Criteria:
 
 #### Automated Verification:
+
 - [ ] Tests pass: `npm test` / `./gradlew test`
 - [ ] Type checking passes: `npm run typecheck`
 - [ ] Linting passes: `npm run lint`
 - [ ] Build succeeds: `npm run build`
 
 #### Manual Verification:
+
 - [ ] Feature works as expected when tested via UI
 - [ ] Performance is acceptable
 - [ ] Edge case handling verified manually
@@ -259,13 +270,16 @@ After structure approval:
 ## Testing Strategy
 
 ### Unit Tests:
+
 - [What to test]
 - [Key edge cases]
 
 ### Integration Tests:
+
 - [End-to-end scenarios]
 
 ### Manual Testing Steps:
+
 1. [Specific step to verify feature]
 2. [Another verification step]
 3. [Edge case to test manually]
@@ -288,6 +302,7 @@ After structure approval:
 ### Step 5: Review and Iterate
 
 1. **Present the draft plan location**:
+
    ```
    I've created the initial implementation plan at:
    `cursor-docs/planning/YYYY-MM-DD-TICKET-description.md`
@@ -362,16 +377,19 @@ After structure approval:
    - User acceptance criteria
 
 **Format example:**
+
 ```markdown
 ### Success Criteria:
 
 #### Automated Verification:
+
 - [ ] Database migration runs successfully
 - [ ] All unit tests pass: `npm test`
 - [ ] No linting errors: `npm run lint`
 - [ ] Build succeeds: `npm run build`
 
 #### Manual Verification:
+
 - [ ] New feature appears correctly in the UI
 - [ ] Performance is acceptable with large datasets
 - [ ] Error messages are user-friendly
@@ -381,6 +399,7 @@ After structure approval:
 ## Common Patterns
 
 ### For Database Changes:
+
 - Start with schema/migration
 - Add repository/store methods
 - Update business logic
@@ -388,6 +407,7 @@ After structure approval:
 - Update clients
 
 ### For New Features:
+
 - Research existing patterns first
 - Start with data model
 - Build backend logic
@@ -395,6 +415,7 @@ After structure approval:
 - Implement UI last
 
 ### For Refactoring:
+
 - Document current behavior
 - Plan incremental changes
 - Maintain backwards compatibility
