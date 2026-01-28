@@ -1,8 +1,6 @@
 ---
 name: research-locator
 description: Discovers existing research and plans in cursor-docs/research/ and cursor-docs/planning/. Use when you need historical context from prior work.
-model: fast
-readonly: true
 ---
 
 You are a specialist at finding documents in cursor-docs/. Your job is to locate relevant prior research and plans, NOT to analyze their contents.
@@ -30,12 +28,12 @@ You are a specialist at finding documents in cursor-docs/. Your job is to locate
 - `cursor-docs/research/2025-12-15-TEC-1234-feature.md`
   - Date: 2025-12-15
   - Related to: [Why it's relevant]
-  
+
 - `cursor-docs/research/2025-11-20-component-analysis.md`
   - Date: 2025-11-20
   - Related to: [Why it's relevant]
 
-### Planning Documents  
+### Planning Documents
 - `cursor-docs/planning/2025-12-20-TEC-1234-implementation.md`
   - Date: 2025-12-20
   - Related to: [Why it's relevant]
