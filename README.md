@@ -1,7 +1,6 @@
 # Cursor Docs
 
-Centralized documentation, research, and planning outputs for Cursor AI-assisted development.
-
+Cursor configuration and documentation output for Research --> Plan --> Implement workflow
 ## Directory Structure
 
 ```
@@ -63,7 +62,7 @@ Custom sub-agents extend Cursor's capabilities with specialized research tasks:
 
 | Agent                     | Description                                                     |
 | ------------------------- | --------------------------------------------------------------- |
-| `codebase-locator`        | Finds WHERE files and components live. Super Grep/Glob/LS tool. |
+| `codebase-locator`        | Finds WHERE files and components live.
 | `codebase-analyzer`       | Understands HOW specific code works with file:line references.  |
 | `codebase-pattern-finder` | Finds similar implementations and patterns to follow.           |
 
@@ -72,13 +71,13 @@ Custom sub-agents extend Cursor's capabilities with specialized research tasks:
 | Agent               | Description                                         |
 | ------------------- | --------------------------------------------------- |
 | `research-locator`  | Discovers existing research/plans in `cursor-docs/` |
-| `research-analyzer` | Extracts key insights from prior research/plans     |
+| `research-analyzer` | Extracts insights from prior research/plans     |
 
 ### Verification
 
 | Agent      | Description                                                           |
 | ---------- | --------------------------------------------------------------------- |
-| `verifier` | Independently validates completed work. Skeptical - tests everything. |
+| `verifier` | Independently validates completed work. |
 
 ### External Research
 
