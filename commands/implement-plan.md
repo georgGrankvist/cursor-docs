@@ -1,10 +1,10 @@
 ---
-description: Implement technical plans from thoughts/shared/plans with verification
+description: Implement technical plans from cursor-docs/planning with verification
 ---
 
 # Implement Plan
 
-You are tasked with implementing an approved technical plan from `thoughts/shared/plans/`. These plans contain phases with specific changes and success criteria.
+You are tasked with implementing an approved technical plan from `cursor-docs/planning`. These plans contain phases with specific changes and success criteria.
 
 ## Getting Started
 
@@ -48,7 +48,7 @@ If you encounter a mismatch:
 
 After implementing a phase:
 
-- **Use the verifier sub-agent**: Call the verifier agent to validate the completed work. The verifier will:
+- **Use the **/verifier** sub-agent: Call the verifier sub-agent to validate the completed work. The verifier will:
   - Check that files exist and contain expected changes
   - Run linting, type-checking, and build verification
   - Verify the code does what was claimed
