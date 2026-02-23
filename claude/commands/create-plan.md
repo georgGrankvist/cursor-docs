@@ -1,0 +1,381 @@
+---
+description: Create detailed implementation plans through interactive research and iteration
+model: claude-opus-4-6
+---
+
+# Implementation Plan
+
+You are tasked with creating detailed implementation plans through an interactive, iterative process. You should be skeptical, thorough, and work collaboratively with the user to produce high-quality technical specifications.
+
+**Path convention**: Plans are written under the **docs root** (directory containing `research/` and `planning/`). Default docs root: `cursor-docs`. Use the planning directory: `{docs_root}/planning/`. Resolve the docs root by checking conversation context or running `echo $AI_DOCS_DIR` if needed.
+
+## Initial Response
+
+When this command is invoked:
+
+1. **Check if parameters were provided**:
+   - If a file path or ticket reference was provided as a parameter, skip the default message
+   - Immediately read any provided files FULLY
+   - Begin the research process
+
+2. **If no parameters provided**, respond with:
+
+```
+I'll help you create a detailed implementation plan. Let me start by understanding what we're building.
+
+Please provide:
+1. The task/ticket description (or reference to a ticket/doc file)
+2. Any relevant context, constraints, or specific requirements
+3. Links to related research or previous implementations
+
+I'll analyze this information and work with you to create a comprehensive plan.
+
+Tip: You can also invoke this command with a file directly: `/create-plan docs/tickets/TEC-1234.md`
+```
+
+Then wait for the user's input.
+
+## Process Steps
+
+### Step 1: Context Gathering & Initial Analysis
+
+1. **Read all mentioned files immediately and FULLY**:
+   - Ticket files or task descriptions
+   - Research documents
+   - Related implementation plans
+   - Any JSON/data files mentioned
+   - **IMPORTANT**: Use the Read tool WITHOUT limit/offset parameters to read entire files
+   - **CRITICAL**: DO NOT spawn sub-agents before reading these files yourself in the main context
+   - **NEVER** read files partially - if a file is mentioned, read it completely
+
+2. **Spawn initial research sub-agents to gather context**:
+   Before asking the user any questions, use specialized sub-agents to research in parallel:
+
+   Invoke these sub-agents in parallel using the Task tool:
+
+   ```
+   Task(subagent_type="codebase-locator", prompt="Find all files related to [feature/component]")
+   Task(subagent_type="codebase-analyzer", prompt="Analyze how [system] currently works")
+   Task(subagent_type="research-locator", prompt="Find existing research or plans in the docs root related to [feature/topic]")
+   ```
+
+   These sub-agents will:
+   - Find relevant source files, configs, and tests
+   - Identify the specific directories to focus on
+   - Trace data flow and key functions
+   - Return detailed explanations with file:line references
+
+3. **Read all files identified by research sub-agents**:
+   - After research sub-agents complete, read ALL files they identified as relevant
+   - Read them FULLY into the main context
+   - This ensures you have complete understanding before proceeding
+
+4. **Analyze and verify understanding**:
+   - Cross-reference the ticket requirements with actual code
+   - Identify any discrepancies or misunderstandings
+   - Note assumptions that need verification
+   - Determine true scope based on codebase reality
+   - Identify project build tooling (Maven, Gradle, npm, pnpm, nx, etc.) for each touched module
+
+5. **Present informed understanding and focused questions**:
+
+   ```
+   Based on the ticket and my research of the codebase, I understand we need to [accurate summary].
+
+   I've found that:
+   - [Current implementation detail with file:line reference]
+   - [Relevant pattern or constraint discovered]
+   - [Potential complexity or edge case identified]
+
+   Questions that my research couldn't answer:
+   - [Specific technical question that requires human judgment]
+   - [Business logic clarification]
+   - [Design preference that affects implementation]
+   ```
+
+   Only ask questions that you genuinely cannot answer through code investigation.
+
+### Step 2: Research & Discovery
+
+After getting initial clarifications:
+
+1. **If the user corrects any misunderstanding**:
+   - DO NOT just accept the correction
+   - Spawn new research sub-agents to verify the correct information
+   - Read the specific files/directories they mention
+   - Only proceed once you've verified the facts yourself
+
+2. **Create a research todo list** using TodoWrite to track exploration tasks
+
+3. **Spawn parallel sub-agents for comprehensive research**:
+   Create multiple Task sub-agents to research different aspects concurrently.
+   Always specify `subagent_type` — never use `subagent_type: "explore"`:
+
+   ```
+   // Spawn these concurrently using multiple Task tool calls in one message:
+   Task(subagent_type="codebase-locator", prompt="Find all files related to database schema for [feature]")
+   Task(subagent_type="codebase-analyzer", prompt="Analyze API patterns in [service]")
+   Task(subagent_type="codebase-pattern-finder", prompt="Find similar implementations of [pattern]")
+   Task(subagent_type="research-analyzer", prompt="Extract key decisions from [prior research doc path]")
+   ```
+
+4. **Wait for ALL sub-agents to complete** before proceeding
+
+5. **Present findings and design options**:
+
+   ```
+   Based on my research, here's what I found:
+
+   **Current State:**
+   - [Key discovery about existing code]
+   - [Pattern or convention to follow]
+
+   **Design Options:**
+   1. [Option A] - [pros/cons]
+   2. [Option B] - [pros/cons]
+
+   **Open Questions:**
+   - [Technical uncertainty]
+   - [Design decision needed]
+
+   Which approach aligns best with your vision?
+   ```
+
+### Step 3: Plan Structure Development
+
+Once aligned on approach:
+
+1. **Create initial plan outline**:
+
+   ```
+   Here's my proposed plan structure:
+
+   ## Overview
+   [1-2 sentence summary]
+
+   ## Implementation Phases:
+   1. [Phase name] - [what it accomplishes]
+   2. [Phase name] - [what it accomplishes]
+   3. [Phase name] - [what it accomplishes]
+
+   Does this phasing make sense? Should I adjust the order or granularity?
+   ```
+
+2. **Get feedback on structure** before writing details
+
+### Step 4: Detailed Plan Writing
+
+After structure approval:
+
+1. **Write the plan** to `{docs_root}/planning/YYYY-MM-DD-TICKET-description.md`
+   - Format: `YYYY-MM-DD-TICKET-description.md` where:
+     - YYYY-MM-DD is today's date
+     - TICKET is the ticket number (omit if no ticket)
+     - description is a brief kebab-case description
+   - Examples:
+     - With ticket: `2025-01-08-TEC-1478-parent-child-tracking.md`
+     - Without ticket: `2025-01-08-improve-error-handling.md`
+
+2. **Use this template structure**:
+
+````markdown
+# [Feature/Task Name] Implementation Plan
+
+## Overview
+
+[Brief description of what we're implementing and why]
+
+## Current State Analysis
+
+[What exists now, what's missing, key constraints discovered]
+
+## Desired End State
+
+[A Specification of the desired end state after this plan is complete, and how to verify it]
+
+### Key Discoveries:
+
+- [Important finding with file:line reference]
+- [Pattern to follow]
+- [Constraint to work within]
+
+## What We're NOT Doing
+
+[Explicitly list out-of-scope items to prevent scope creep]
+
+## Implementation Approach
+
+[High-level strategy and reasoning]
+
+## Phase 1: [Descriptive Name]
+
+### Overview
+
+[What this phase accomplishes]
+
+### Changes Required:
+
+#### 1. [Component/File Group]
+
+**File**: `path/to/file.ext`
+**Changes**: [Summary of changes]
+
+```[language]
+// Specific code to add/modify
+```
+
+### Success Criteria:
+
+#### Automated Verification:
+
+- [ ] [Tooling-specific command] Tests pass
+- [ ] [Tooling-specific command] Static checks pass (type/lint/analysis where applicable)
+- [ ] [Optional] Build/compile succeeds when feasible and relevant
+
+#### Manual Verification:
+
+- [ ] Feature works as expected when tested via UI
+- [ ] Performance is acceptable
+- [ ] Edge case handling verified manually
+- [ ] No regressions in related features
+
+**Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation before proceeding to the next phase.
+
+---
+
+## Phase 2: [Descriptive Name]
+
+[Similar structure...]
+
+---
+
+## Testing Strategy
+
+### Unit Tests:
+
+- [What to test]
+- [Key edge cases]
+
+### Integration Tests:
+
+- [End-to-end scenarios]
+
+### Manual Testing Steps:
+
+1. [Specific step to verify feature]
+2. [Another verification step]
+3. [Edge case to test manually]
+
+## Performance Considerations
+
+[Any performance implications or optimizations needed]
+
+## Migration Notes
+
+[If applicable, how to handle existing data/systems]
+
+## References
+
+- Original ticket: [link or file reference]
+- Related research: [relevant docs]
+- Similar implementation: `[file:line]`
+````
+
+### Step 5: Review and Iterate
+
+1. **Present the draft plan location**:
+
+   ```
+   I've created the initial implementation plan at:
+   `{docs_root}/planning/YYYY-MM-DD-TICKET-description.md`
+
+   Please review it and let me know:
+   - Are the phases properly scoped?
+   - Are the success criteria specific enough?
+   - Any technical details that need adjustment?
+   - Missing edge cases or considerations?
+   ```
+
+2. **Iterate based on feedback** - be ready to:
+   - Add missing phases
+   - Adjust technical approach
+   - Clarify success criteria (both automated and manual)
+   - Add/remove scope items
+
+3. **Continue refining** until the user is satisfied
+
+## Important Guidelines
+
+1. **Be Skeptical**:
+   - Question vague requirements
+   - Identify potential issues early
+   - Ask "why" and "what about"
+   - Don't assume - verify with code
+
+2. **Be Interactive**:
+   - Don't write the full plan in one shot
+   - Get buy-in at each major step
+   - Allow course corrections
+   - Work collaboratively
+
+3. **Be Thorough**:
+   - Read all context files COMPLETELY before planning
+   - Research actual code patterns using parallel sub-agents
+   - Include specific file paths and line numbers
+   - Write measurable success criteria with clear automated vs manual distinction
+
+4. **Be Practical**:
+   - Focus on incremental, testable changes
+   - Consider migration and rollback
+   - Think about edge cases
+   - Include "what we're NOT doing"
+
+5. **Track Progress**:
+   - Use TodoWrite to track planning tasks
+   - Update todos as you complete research
+   - Mark planning tasks complete when done
+
+6. **No Open Questions in Final Plan**:
+   - If you encounter open questions during planning, STOP
+   - Research or ask for clarification immediately
+   - Do NOT write the plan with unresolved questions
+   - The implementation plan must be complete and actionable
+   - Every decision must be made before finalizing the plan
+
+## Success Criteria Guidelines
+
+**Always separate success criteria into two categories:**
+
+1. **Automated Verification** (can be run automatically):
+   - Commands specific to the repository's actual tooling
+   - First identify build system/package manager from repo files (e.g. `pom.xml`, `build.gradle`, `package.json`, `nx.json`, lockfiles)
+   - Specific files that should exist
+   - Code compilation/type checking where applicable
+
+2. **Manual Verification** (requires human testing):
+   - UI/UX functionality
+   - Performance under real conditions
+   - Edge cases that are hard to automate
+   - User acceptance criteria
+
+## Sub-agent Spawning Best Practices
+
+When spawning research sub-agents:
+
+1. **Spawn multiple sub-agents in parallel** for efficiency - use multiple Task tool calls in a single message
+2. **Always specify `subagent_type`** matching the custom agent name (e.g., `codebase-locator`, `codebase-analyzer`). Never use `subagent_type: "explore"`.
+3. **Each sub-agent should be focused** on a specific area
+4. **Provide clear instructions** including:
+   - Exactly what to search for
+   - Which directories to focus on
+   - What information to extract
+5. **Be EXTREMELY specific about directories**:
+   - If the ticket mentions frontend, specify the frontend directory
+   - If it mentions a specific service, specify that service's directory
+   - Never use generic terms - include the full path context
+6. **Request specific file:line references** in responses
+7. **Wait for all sub-agents to complete** before synthesizing
+8. **Verify sub-agent results**:
+   - If a sub-agent returns unexpected results, spawn follow-up sub-agents
+   - Cross-check findings against the actual codebase
+   - Don't accept results that seem incorrect

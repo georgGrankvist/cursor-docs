@@ -1,41 +1,45 @@
-# Cursor Docs
+# AI Workflow Docs
 
-Cursor configuration and documentation output for Research --> Plan --> Implement workflow
+Commands and sub-agents for a **Research → Plan → Implement** workflow, with versions for both Cursor and Claude Code.
+
 ## Directory Structure
 
 ```
 cursor-docs/
-├── research/           # Research outputs from /research-codebase command
-├── planning/           # Implementation plans from /create-plan command
-├── commands/           # Backup of custom slash commands (installed in ~/.cursor/commands/)
-└── agents/             # Backup of custom sub-agents (installed in ~/.cursor/agents/)
+├── cursor/
+│   ├── agents/       # Cursor sub-agents (model: fast/opus aliases)
+│   └── commands/     # Cursor slash commands
+├── claude/
+│   ├── agents/       # Claude Code sub-agents (model: haiku/sonnet)
+│   └── commands/     # Claude Code slash commands (subagent_type-aware)
+├── research/         # Research output from /research-codebase
+├── planning/         # Implementation plans from /create-plan
+└── install.sh        # Install script
 ```
 
 ## Installation
 
-Commands and agents need to be installed in your user `.cursor` directory to be available across all projects:
+```bash
+# Install for Cursor
+./install.sh cursor
+
+# Install for Claude Code
+./install.sh claude
+```
+
+For Claude Code, set `AI_DOCS_DIR` in your shell profile so commands can locate the docs root from any project:
 
 ```bash
-# Create directories if they don't exist
-mkdir -p ~/.cursor/commands
-mkdir -p ~/.cursor/agents
-
-# Install commands
-cp cursor-docs/commands/*.md ~/.cursor/commands/
-
-# Install agents
-cp cursor-docs/agents/*.md ~/.cursor/agents/
+export AI_DOCS_DIR="/path/to/cursor-docs"
 ```
 
 ## Commands
-
-These slash commands implement a **Research → Plan → Implement** workflow:
 
 ### `/research-codebase`
 
 Conducts comprehensive codebase research using parallel sub-agents.
 
-- **Output**: `cursor-docs/research/YYYY-MM-DD-TICKET-description.md`
+- **Output**: `{docs_root}/research/YYYY-MM-DD-TICKET-description.md`
 - **Usage**: `/research-codebase` then describe what you want to research
 - **Sub-agents used**: codebase-locator, codebase-analyzer, codebase-pattern-finder, research-locator
 
@@ -43,62 +47,28 @@ Conducts comprehensive codebase research using parallel sub-agents.
 
 Creates detailed implementation plans through interactive research and iteration.
 
-- **Output**: `cursor-docs/planning/YYYY-MM-DD-TICKET-description.md`
-- **Usage**: `/create-plan` or `/create-plan @path/to/ticket.md`
+- **Output**: `{docs_root}/planning/YYYY-MM-DD-TICKET-description.md`
+- **Usage**: `/create-plan` or `/create-plan path/to/ticket.md`
 - **Sub-agents used**: codebase-locator, codebase-analyzer, codebase-pattern-finder, research-locator, research-analyzer
 
 ### `/implement-plan`
 
 Implements approved technical plans with verification checkpoints.
 
-- **Usage**: `/implement-plan @cursor-docs/planning/YYYY-MM-DD-plan.md`
-- **Sub-agents used**: codebase-analyzer, codebase-pattern-finder(sparingly), verifier
+- **Usage**: `/implement-plan path/to/plan.md`
+- **Sub-agents used**: verifier
 
 ## Sub-agents
 
-Custom sub-agents extend Cursor's capabilities with specialized research tasks:
-
-### Codebase Research
-
-| Agent                     | Description                                                     |
-| ------------------------- | --------------------------------------------------------------- |
-| `codebase-locator`        | Finds WHERE files and components live.
-| `codebase-analyzer`       | Understands HOW specific code works with file:line references.  |
-| `codebase-pattern-finder` | Finds similar implementations and patterns to follow.           |
-
-### Historical Context
-
-| Agent               | Description                                         |
-| ------------------- | --------------------------------------------------- |
-| `research-locator`  | Discovers existing research/plans in `cursor-docs/` |
-| `research-analyzer` | Extracts insights from prior research/plans     |
-
-### Verification
-
-| Agent      | Description                                                           |
-| ---------- | --------------------------------------------------------------------- |
-| `verifier` | Independently validates completed work. |
-
-### External Research
-
-| Agent                   | Description                                       |
-| ----------------------- | ------------------------------------------------- |
-| `web-search-researcher` | Searches web for documentation and best practices |
-
-## Invoking Sub-agents
-
-Sub-agents can be invoked in several ways:
-
-```bash
-# Direct invocation
-/codebase-locator find all files related to authentication
-
-# Natural language
-Use the codebase-analyzer to understand how the service works
-
-# In chat
-Delegate to /codebase-pattern-finder to find similar REST endpoints
-```
+| Agent                     | Model  | Description                                              |
+| ------------------------- | ------ | -------------------------------------------------------- |
+| `codebase-locator`        | haiku  | Finds WHERE files and components live                    |
+| `codebase-analyzer`       | sonnet | Understands HOW specific code works with file:line refs  |
+| `codebase-pattern-finder` | haiku  | Finds similar implementations and patterns to follow     |
+| `research-locator`        | haiku  | Discovers existing research/plans in the docs root       |
+| `research-analyzer`       | sonnet | Extracts insights from prior research/plans              |
+| `verifier`                | sonnet | Independently validates completed work                   |
+| `web-search-researcher`   | haiku  | Searches web for documentation and best practices        |
 
 ## Workflow Example
 
@@ -110,27 +80,23 @@ Delegate to /codebase-pattern-finder to find similar REST endpoints
    Output: cursor-docs/research/2025-01-26-authentication-flow.md
 
 2. Create implementation plan
-   > /create-plan @cursor-docs/research/2025-01-26-authentication-flow.md
+   > /create-plan cursor-docs/research/2025-01-26-authentication-flow.md
    > Add OAuth2 support for external providers
 
    Output: cursor-docs/planning/2025-01-26-TEC-1234-oauth2-support.md
 
 3. Implement the plan
-   > /implement-plan @cursor-docs/planning/2025-01-26-TEC-1234-oauth2-support.md
+   > /implement-plan cursor-docs/planning/2025-01-26-TEC-1234-oauth2-support.md
 ```
 
-## Configuration
+## Key Differences: Cursor vs Claude Code
 
-All agents use Cursor-compatible frontmatter:
-
-```yaml
----
-name: agent-name
-description: When to use this agent (Cursor uses this for auto-delegation)
-model: fast # Options: fast, inherit, or model ID
-readonly: true # Restricts write operations
----
-```
+| | Cursor | Claude Code |
+|---|---|---|
+| Model aliases | `fast`, `opus` | `haiku`, `sonnet`, `claude-opus-4-6` |
+| Sub-agent invocation | `/agent-name` in prompt | `subagent_type="agent-name"` in Task call |
+| File referencing | `@path/to/file` | Full path or `/add-dir` |
+| Docs root | Relative `cursor-docs/` via workspace | `$AI_DOCS_DIR` env var |
 
 ## File Naming Convention
 
