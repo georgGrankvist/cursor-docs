@@ -12,6 +12,10 @@ cursor-docs/
 ├── claude/
 │   ├── agents/       # Claude Code sub-agents (model: haiku/sonnet)
 │   └── commands/     # Claude Code slash commands (subagent_type-aware)
+├── skills/           # Shared Agent Skills (works in both Cursor and Claude Code)
+│   └── fix-pr-review/
+│       └── SKILL.md
+├── mcp/              # MCP server setup guides
 ├── research/         # Research output from /research-codebase
 ├── planning/         # Implementation plans from /create-plan
 └── install.sh        # Install script
@@ -26,6 +30,8 @@ cursor-docs/
 # Install for Claude Code
 ./install.sh claude
 ```
+
+Each command installs tool-specific agents and commands, plus the shared skills from `skills/`.
 
 For Claude Code, set `AI_DOCS_DIR` in your shell profile so commands can locate the docs root from any project:
 
@@ -57,6 +63,25 @@ Implements approved technical plans with verification checkpoints.
 
 - **Usage**: `/implement-plan path/to/plan.md`
 - **Sub-agents used**: verifier
+
+## Skills
+
+Skills follow the [Agent Skills](https://agentskills.io) open standard and work in both Cursor and Claude Code.
+
+### `/fix-pr-review`
+
+Fetches unresolved review comments from a GitHub PR and applies fixes to the local codebase.
+
+- **Usage**: `/fix-pr-review https://github.com/owner/repo/pull/123`
+- **Requires**: GitHub MCP server (see `mcp/github.md`)
+
+## MCP Servers
+
+Some commands require MCP servers. Setup guides live in `mcp/`:
+
+| Server | Guide | Used by |
+|--------|-------|---------|
+| GitHub | `mcp/github.md` | `/fix-pr-review` |
 
 ## Sub-agents
 
